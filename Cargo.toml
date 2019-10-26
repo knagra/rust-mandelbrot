@@ -1,0 +1,12 @@
+[package]
+name = "mandelbrot"
+version = "0.1.0"
+authors = ["Karandeep Nagra <karandeepsnagra@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossbeam = "0.2.8"
+num = "0.1.27"
+image = "0.13.0"
