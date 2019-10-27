@@ -148,6 +148,7 @@ fn write_image(filename: &str, pixels: &[u8], pixel_width: usize, pixel_height: 
     Ok(())
 }
 
+#[allow(dead_code)]
 fn synchronous(
     pixels: &mut [u8], pixel_width: usize, pixel_height: usize, upper_left: Complex<f64>,
     lower_right: Complex<f64>
@@ -177,7 +178,7 @@ fn concurrent(
                     upper_left, lower_right
                 );
 
-                spawner.spawn(move || {
+                spawner.spawn(move |_| {
                     render(
                         band, pixel_width, band_height, band_upper_left, band_lower_right
                     );
