@@ -116,18 +116,34 @@ fn render(
     pixels: &mut [u8], pixel_width: usize, pixel_height: usize, upper_left: Complex<f64>,
     lower_right: Complex<f64>
 ) {
-    assert!(pixels.len() == pixel_width * pixel_height);
+    assert!(pixels.len() == pixel_width * pixel_height * 3);
 
     for row in 0..pixel_height {
         for column in 0..pixel_width {
             let point = pixel_to_point(
                 pixel_width, pixel_height, (column, row), upper_left, lower_right
             );
-            pixels[row * pixel_width + column] =
+            match escape_time(point, 255) {
+                None => {
+                    pixels[row * pixel_width * 3 + column * 3] = 0;
+                    pixels[row * pixel_width * 3 + column * 3 + 1] = 0;
+                    pixels[row * pixel_width * 3 + column * 3 + 2] = 0;
+                },
+                Some(count) => {
+                    pixels[row * pixel_width * 3 + column * 3] = 255 - count as u8;
+                    pixels[row * pixel_width * 3 + column * 3 + 1] = 175 as u8;
+                    pixels[row * pixel_width * 3 + column * 3 + 2] = 175 as u8;
+                }
+            };
+            /*
+            pixels[row * pixel_width + column * 3] =
                 match escape_time(point, 255) {
                     None => 0,
                     Some(count) => 255 - count as u8
-                }
+                };
+            pixels[row * pixel_width + column * 3 + 1] = 0;
+            pixels[row * pixel_width + column * 3 + 2] = 0;
+            */
         }
     }
 }
@@ -143,7 +159,7 @@ fn write_image(filename: &str, pixels: &[u8], pixel_width: usize, pixel_height: 
         &pixels,
         pixel_width as u32,
         pixel_height as u32,
-        ColorType::Gray(8)
+        ColorType::RGB(8)
     )?;
     Ok(())
 }
@@ -164,12 +180,12 @@ fn concurrent(
     let rows_per_band = pixel_height / threads + 1;
 
     {
-        let bands: Vec<&mut [u8]> = pixels.chunks_mut(rows_per_band * pixel_width)
+        let bands: Vec<&mut [u8]> = pixels.chunks_mut(rows_per_band * pixel_width * 3)
                 .collect();
         crossbeam::scope(|spawner| {
             for (i, band) in bands.into_iter().enumerate() {
                 let top = rows_per_band * i;
-                let band_height = band.len() / pixel_width;
+                let band_height = band.len() / (pixel_width * 3);
                 let band_upper_left = pixel_to_point(
                     pixel_width, pixel_height, (0, top), upper_left, lower_right
                 );
@@ -213,7 +229,7 @@ fn main() {
         "error parsing lower right corner point"
     );
 
-    let mut pixels = vec![0; pixel_width * pixel_height];
+    let mut pixels = vec![0; pixel_width * pixel_height * 3];
     // synchronous(&mut pixels, pixel_width, pixel_height, upper_left, lower_right);
     concurrent(&mut pixels, pixel_width, pixel_height, upper_left, lower_right);
 
