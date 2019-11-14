@@ -130,9 +130,10 @@ fn render(
                     pixels[row * pixel_width * 3 + column * 3 + 2] = 0;
                 },
                 Some(count) => {
-                    pixels[row * pixel_width * 3 + column * 3] = 255 - count as u8;
+                    pixels[row * pixel_width * 3 + column * 3] =
+                        ((column * 255 + count as usize) / (pixel_width * 2)) as u8;
                     pixels[row * pixel_width * 3 + column * 3 + 1] =
-                        (column * 255 / pixel_width) as u8;
+                        255 - count as u8;
                     pixels[row * pixel_width * 3 + column * 3 + 2] =
                         (255 - column * 255 / pixel_width) as u8;
                 }
