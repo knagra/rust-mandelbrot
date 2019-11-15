@@ -5,3 +5,4 @@ Based on exercise in Programming Rust by Jim Blandy & Jason Orendorff
 See the `samples/` directory for some Mandelbrot sets generated with this package.
 
 ![Mandelbrot image](samples/mandel-13.png)
+![Mandelbrot detail](samples/mandel-17.png)
